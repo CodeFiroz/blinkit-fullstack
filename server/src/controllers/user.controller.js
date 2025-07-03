@@ -1,8 +1,9 @@
+import Mailer from "../mails/mailer.js";
 import User from "../models/user.model.js";
 import { genrateToken } from "../utils/manageToken.js";
 import { validateFields } from "../utils/validateFields.js";
 import bcrypt from "bcrypt";
-
+import jwt from "jsonwebtoken";
 
 
 //  user registeration controller ⚙️
@@ -58,6 +59,12 @@ export const registerUser = async (req, res) => {
         }
 
         genrateToken(res, savedUser._id);
+
+        const verificationToken  = jwt.sign({userid: savedUser._id}, process.env.JWT_SECRET, {expiresIn: '30d'});
+        
+        const verificationLink = `http://localhost:5000/verification/${verificationToken}`;
+
+        await Mailer(savedUser.email, 'welcome', {verificationLink: verificationLink, userName: savedUser.name}, "Welcome to Blinkit");
 
         console.log(`✅ Yaaay new user is registered 🎉`);
         return res.status(201).json({
