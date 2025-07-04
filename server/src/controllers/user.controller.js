@@ -129,6 +129,22 @@ export const loginUser = async (req, res) => {
             });
        }
 
+       if(userSearch.status != "active"){
+         console.warn(`🔴 [INACTIVE_USER] your account is inactive or suspended. contact us for more details.`);
+            return res.status(401).json({
+                success: false,
+                message: `suspended or inactive account`,
+            });
+       }
+
+       if(userSearch.verifyEmail ==  false){
+         console.warn(`🔴 [NEED_VERIFICATION] email not verified`);
+            return res.status(401).json({
+                success: false,
+                message: ` Please verify your email. we sent a verification mail to your address. Check the spam folder`,
+            });
+       }
+
         genrateToken(res, userSearch._id);
 
         userSearch.lastLogin = new Date.now();
@@ -347,6 +363,55 @@ export const resetPassword = async (req, res) => {
     }
 }
 
+//  email verification user controller ⚙️
+
+export const emailVerification = async (req, res) => {
+    try {
+
+        let { token } = req.params;
+
+        const decode = jwt.verify(token, process.env.JWT_SECRET);
+
+        if(!decode){
+        console.warn(`🔴 [INVAILID_VERIFICATION_TOKEN] can't decode verification token.`);
+        return res.status(400).json({
+            success: false,
+            message: `Invalid token. can't verify.`
+        });
+        }
+
+        const user_id = decode.userId;
+
+        const findUser = await User.findById(user_id);
+
+        if(!findUser){
+        console.warn(`🔴 [USER_NOT_FOUND] user doesn't exist.`);
+        return res.status(400).json({
+            success: false,
+            message: `Invalid token. user not found.`
+        });
+        }
+
+        findUser.verifyEmail = true;
+
+        await findUser.save();
+
+        console.log(`✅ [EMAIL_VERIFIED] user email verified successfully.`);
+        return res.status(200).json({
+            success: false,
+            message: `user email verified successfully`
+        });
+        
+    } catch (error) {
+        console.warn(`🔴 [AUTH_VERIFICATION_FAILED] can'tverify email right now.`);
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: `Ooops! Internal server error 🛜.`
+        });
+    }
+}
+
 //  get logged in user controller ⚙️
 
 export const getCurrentUser = async (req, res) => {
@@ -360,9 +425,11 @@ export const getCurrentUser = async (req, res) => {
             message: `verify user`,
             data: {
                 user_id: user._id,
+                user_avatar: user.avatar,
                 full_name: user.name,
                 email_address: user.email,
                 phone_number: user.phone,
+                user_address: user.address,
                 cart_items: user.cart,
             }
         });

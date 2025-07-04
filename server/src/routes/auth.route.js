@@ -1,5 +1,7 @@
 import express from "express";
-import { loginUser, registerUser, resetPassword, sendForgotOTP, verifyOTP } from "../controllers/user.controller.js";
+import { emailVerification, getCurrentUser, loginUser, registerUser, resetPassword, sendForgotOTP, verifyOTP } from "../controllers/user.controller.js";
+import { protectRoute } from "../middlewares/authMIddleWare.js";
+
 
 const router = express.Router();
 
@@ -8,5 +10,8 @@ router.post("/login", loginUser);
 router.post("/send-forgot-otp", sendForgotOTP);
 router.post("/verify-otp", verifyOTP);
 router.post("/reset-password", resetPassword);
+
+router.get("/verify/:token", emailVerification);
+router.get("/me", protectRoute, getCurrentUser);
 
 export default router;

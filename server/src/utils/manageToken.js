@@ -5,7 +5,7 @@ export const genrateToken = (res, userid)=>{
 
         const token  = jwt.sign({userid}, process.env.JWT_SECRET, {expiresIn: '7d'});
 
-        res.cookie("auth-token", token, {
+        res.cookie("authToken", token, {
              maxAge: 7 * 24 * 60 * 60 * 1000, 
             httpOnly: process.env.NODE_ENV !== "development",
             sameSite: "Strict",
