@@ -6,9 +6,13 @@ const categorySchema = new mongoose.Schema({
         trim: true,
         required: true,
     },
-    image: {
+    slug: {
         type: String,
-        default: ""
+        required: true,
+    },
+    image: {
+        type: Object,
+        required: true,
     }    
 },
     {timestamps: true}

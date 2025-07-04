@@ -7,6 +7,10 @@ const productSchema = new mongoose.Schema({
         trim: true,
         required: true,
     },
+     slug: {
+        type: String,
+        required: true,
+    },
     images: {
         type: Array,
         default: [],

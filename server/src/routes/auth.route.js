@@ -9,7 +9,7 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/send-forgot-otp", sendForgotOTP);
 router.post("/verify-otp", verifyOTP);
-router.post("/reset-password", resetPassword);
+router.patch("/reset-password", resetPassword);
 
 router.get("/verify/:token", emailVerification);
 router.get("/me", protectRoute, getCurrentUser);
